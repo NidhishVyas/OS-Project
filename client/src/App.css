@@ -1,0 +1,22 @@
+.App {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  text-align: center;
+}
+
+.buttons {
+  margin: 20px;
+}
+
+.buttons button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.chart-container {
+  margin: 20px auto;
+  width: 90%;
+  max-width: 800px;
+}
