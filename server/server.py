@@ -16,14 +16,14 @@ def get_metrics():
     global prev_net_io
 
     if not is_running:
-        return jsonify({"message": "Monitoring is stopped"})
+        return jsonify({"message": "Monitoring is stopped"}), 200
 
     disk_usage = psutil.disk_usage("/")
 
     memory = psutil.virtual_memory()
 
     cpu_count = psutil.cpu_count(logical=True)
-    cpu_percent = psutil.cpu_percent(interval=1) / cpu_count
+    cpu_percent = psutil.cpu_percent(interval=2)
 
     net_io = psutil.net_io_counters()
     upload_speed = ((net_io.bytes_sent - prev_net_io.bytes_sent) * 8) / 2
@@ -39,42 +39,43 @@ def get_metrics():
         reverse=True,
     )[:6]
 
-    return jsonify(
-        {
-            "disk_usage_percent": disk_usage.percent,
-            "memory_percent": memory.percent,
-            "cpu_percent": cpu_percent,
-            "upload_speed": upload_speed,
-            "download_speed": download_speed,
-            "bytes_sent": net_io.bytes_sent,
-            "bytes_recv": net_io.bytes_recv,
-            "boot_time": boot_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "uptime": str(uptime),
-            "top_processes": [
-                {
-                    "pid": proc.info["pid"],
-                    "name": proc.info["name"],
-                    "cpu_percent": proc.info["cpu_percent"] / cpu_count,
-                    "memory_percent": proc.info["memory_percent"],
-                }
-                for proc in processes
-            ],
-        }
-    )
+    response = {
+        "disk_usage_percent": disk_usage.percent,
+        "memory_percent": memory.percent,
+        # "cpu_percent": cpu_percent / cpu_count if cpu_count else 0,
+        "cpu_percent": cpu_percent,
+        "upload_speed": upload_speed,
+        "download_speed": download_speed,
+        "bytes_sent": net_io.bytes_sent,
+        "bytes_recv": net_io.bytes_recv,
+        "boot_time": boot_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "uptime": str(uptime),
+        "top_processes": [
+            {
+                "pid": proc.info["pid"],
+                "name": proc.info["name"],
+                # "cpu_percent": proc.info["cpu_percent"],
+                "cpu_percent": proc.info["cpu_percent"] / cpu_count if cpu_count else 0,
+                "memory_percent": proc.info["memory_percent"],
+            }
+            for proc in processes
+        ],
+    }
+    return jsonify(response), 200
 
 
 @app.route("/api/stop", methods=["POST"])
 def stop_monitoring():
     global is_running
     is_running = False
-    return jsonify({"message": "Monitoring stopped"})
+    return jsonify({"message": "Monitoring stopped"}), 200
 
 
 @app.route("/api/start", methods=["POST"])
 def start_monitoring():
     global is_running
     is_running = True
-    return jsonify({"message": "Monitoring started"})
+    return jsonify({"message": "Monitoring started"}), 200
 
 
 if __name__ == "__main__":
