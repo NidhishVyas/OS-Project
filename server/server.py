@@ -42,7 +42,6 @@ def get_metrics():
     response = {
         "disk_usage_percent": disk_usage.percent,
         "memory_percent": memory.percent,
-        # "cpu_percent": cpu_percent / cpu_count if cpu_count else 0,
         "cpu_percent": cpu_percent,
         "upload_speed": upload_speed,
         "download_speed": download_speed,
@@ -54,7 +53,6 @@ def get_metrics():
             {
                 "pid": proc.info["pid"],
                 "name": proc.info["name"],
-                # "cpu_percent": proc.info["cpu_percent"],
                 "cpu_percent": proc.info["cpu_percent"] / cpu_count if cpu_count else 0,
                 "memory_percent": proc.info["memory_percent"],
             }
